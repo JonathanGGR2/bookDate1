@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>The Book Date 📚</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f5ede0;
+    --warm-white: #faf6f0;
+    --amber: #c8873a;
+    --amber-light: #e8a95a;
+    --amber-glow: rgba(200, 135, 58, 0.15);
+    --burgundy: #7a2d3a;
+    --burgundy-deep: #4d1a22;
+    --ink: #2a1f1a;
+    --ink-soft: #5a4035;
+    --paper: #ede0cc;
+    --gold: #c9a84c;
+    --p1-color: #7a2d3a;
+    --p2-color: #2d5a7a;
+    --p1-light: #f5e8ea;
+    --p2-light: #e8f0f5;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Lora', Georgia, serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 80%, rgba(200,135,58,0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(122,45,58,0.08) 0%, transparent 50%),
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 40px,
+        rgba(180,130,80,0.03) 40px,
+        rgba(180,130,80,0.03) 41px
+      );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .screen {
+    display: none;
+    min-height: 100vh;
+    padding: 24px 20px 40px;
+    position: relative;
+    z-index: 1;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeIn 0.5s ease;
+  }
+  .screen.active { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── WELCOME ── */
+  .welcome-header {
+    text-align: center;
+    margin-top: 32px;
+    margin-bottom: 28px;
+  }
+  .candle-icon {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 8px;
+    animation: flicker 2.5s ease-in-out infinite alternate;
+  }
+  @keyframes flicker {
+    0%   { filter: drop-shadow(0 0 8px rgba(200,135,58,0.6)); transform: scale(1); }
+    100% { filter: drop-shadow(0 0 20px rgba(200,135,58,0.9)); transform: scale(1.04); }
+  }
+  .title-main {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--burgundy-deep);
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+  }
+  .title-sub {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--amber);
+    margin-top: 6px;
+    letter-spacing: 0.5px;
+  }
+
+  .card {
+    background: var(--warm-white);
+    border-radius: 18px;
+    padding: 22px 20px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 4px 24px rgba(90,40,20,0.10), 0 1px 0 rgba(255,255,255,0.8) inset;
+    border: 1px solid rgba(180,130,80,0.18);
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 14px;
+  }
+
+  .name-input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .player-dot {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .p1-dot { background: var(--p1-light); border: 2px solid var(--p1-color); }
+  .p2-dot { background: var(--p2-light); border: 2px solid var(--p2-color); }
+
+  input[type="text"] {
+    flex: 1;
+    border: 1.5px solid rgba(180,130,80,0.3);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-family: 'Lora', serif;
+    font-size: 15px;
+    color: var(--ink);
+    background: var(--warm-white);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  input[type="text"]:focus {
+    border-color: var(--amber);
+    box-shadow: 0 0 0 3px rgba(200,135,58,0.12);
+  }
+  input[type="text"]::placeholder { color: rgba(90,64,53,0.35); }
+
+  .how-it-works {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.65;
+    font-style: italic;
+  }
+  .how-it-works li { margin-bottom: 5px; padding-left: 4px; }
+  .how-it-works li::marker { content: "✦  "; color: var(--amber); }
+
+  /* ── BUTTONS ── */
+  .btn-primary {
+    background: linear-gradient(135deg, var(--burgundy) 0%, var(--burgundy-deep) 100%);
+    color: var(--cream);
+    border: none;
+    border-radius: 50px;
+    padding: 14px 32px;
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(77,26,34,0.3);
+    transition: transform 0.15s, box-shadow 0.15s;
+    width: 100%;
+    max-width: 420px;
+    margin-top: 8px;
+  }
+  .btn-primary:active { transform: scale(0.97); }
+  .btn-primary:hover  { box-shadow: 0 6px 20px rgba(77,26,34,0.4); }
+  .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  /* ── PASS SCREEN ── */
+  .pass-screen-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    text-align: center;
+    padding: 24px;
+  }
+  .pass-emoji { font-size: 64px; margin-bottom: 16px; animation: bounce 0.6s ease; }
+  @keyframes bounce {
+    0%,100% { transform: translateY(0); }
+    40% { transform: translateY(-14px); }
+  }
+  .pass-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--burgundy-deep);
+    margin-bottom: 6px;
+  }
+  .pass-sub {
+    font-size: 14px;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin-bottom: 32px;
+    line-height: 1.5;
+  }
+
+  /* ── QUESTION SCREEN ── */
+  .q-header {
+    width: 100%;
+    max-width: 420px;
+    margin-bottom: 18px;
+  }
+  .progress-bar-wrap {
+    height: 5px;
+    background: rgba(180,130,80,0.18);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.4s ease;
+  }
+  .p1-fill { background: linear-gradient(90deg, var(--p1-color), var(--amber-light)); }
+  .p2-fill { background: linear-gradient(90deg, var(--p2-color), #5a9ec8); }
+
+  .q-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+  .player-badge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    font-size: 11px;
+    font-family: 'Playfair Display', serif;
+  }
+  .p1-badge { background: var(--p1-light); color: var(--p1-color); border: 1px solid var(--p1-color); }
+  .p2-badge { background: var(--p2-light); color: var(--p2-color); border: 1px solid var(--p2-color); }
+
+  .question-card {
+    background: var(--warm-white);
+    border-radius: 20px;
+    padding: 24px 20px 20px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 4px 24px rgba(90,40,20,0.10);
+    border: 1px solid rgba(180,130,80,0.18);
+    margin-bottom: 14px;
+  }
+  .q-category {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--amber);
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .q-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--burgundy-deep);
+    line-height: 1.35;
+    margin-bottom: 20px;
+  }
+
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .options-grid.single-col { grid-template-columns: 1fr; }
+  .options-grid.three-col { grid-template-columns: 1fr 1fr 1fr; }
+
+  .option-btn {
+    background: var(--cream);
+    border: 2px solid rgba(180,130,80,0.22);
+    border-radius: 14px;
+    padding: 12px 10px;
+    font-family: 'Lora', serif;
+    font-size: 13.5px;
+    color: var(--ink);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.18s;
+    line-height: 1.35;
+  }
+  .option-btn .opt-emoji { font-size: 22px; display: block; margin-bottom: 4px; }
+  .option-btn:active { transform: scale(0.96); }
+
+  .option-btn.p1-selected {
+    background: var(--p1-light);
+    border-color: var(--p1-color);
+    color: var(--p1-color);
+    font-weight: 600;
+    box-shadow: 0 0 0 3px rgba(122,45,58,0.12);
+  }
+  .option-btn.p2-selected {
+    background: var(--p2-light);
+    border-color: var(--p2-color);
+    color: var(--p2-color);
+    font-weight: 600;
+    box-shadow: 0 0 0 3px rgba(45,90,122,0.12);
+  }
+
+  /* ── LOADING ── */
+  .loading-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    text-align: center;
+    padding: 24px;
+  }
+  .loading-book { font-size: 60px; animation: spin-book 2s linear infinite; }
+  @keyframes spin-book {
+    0%   { transform: rotateY(0deg);   }
+    50%  { transform: rotateY(180deg); }
+    100% { transform: rotateY(360deg); }
+  }
+  .loading-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--burgundy-deep);
+    margin: 16px 0 8px;
+  }
+  .loading-dots span {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--amber);
+    margin: 0 3px;
+    animation: dotBounce 1.2s ease-in-out infinite;
+  }
+  .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes dotBounce {
+    0%,80%,100% { transform: scale(0.7); opacity: 0.5; }
+    40% { transform: scale(1.2); opacity: 1; }
+  }
+
+  /* ── RESULTS ── */
+  .results-header {
+    text-align: center;
+    margin-bottom: 24px;
+    margin-top: 16px;
+  }
+  .results-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--burgundy-deep);
+    margin-bottom: 6px;
+  }
+  .results-sub {
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--amber);
+    font-size: 14px;
+    margin: 4px 0 16px;
+    width: 100%;
+    max-width: 420px;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--amber), transparent);
+  }
+
+  .book-card {
+    background: var(--warm-white);
+    border-radius: 20px;
+    padding: 20px 18px;
+    width: 100%;
+    max-width: 420px;
+    margin-bottom: 14px;
+    border: 1px solid rgba(180,130,80,0.22);
+    box-shadow: 0 4px 18px rgba(90,40,20,0.09);
+    animation: slideUp 0.5s ease both;
+  }
+  .book-card:nth-child(1) { animation-delay: 0.1s; }
+  .book-card:nth-child(2) { animation-delay: 0.25s; }
+  .book-card:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .book-num {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 6px;
+  }
+  .book-title-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--burgundy-deep);
+    line-height: 1.25;
+    margin-bottom: 3px;
+  }
+  .book-author {
+    font-size: 12px;
+    font-style: italic;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+  }
+  .book-desc {
+    font-size: 13.5px;
+    color: var(--ink);
+    line-height: 1.65;
+    margin-bottom: 10px;
+  }
+  .book-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag {
+    background: var(--amber-glow);
+    color: var(--amber);
+    border: 1px solid rgba(200,135,58,0.3);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .why-card {
+    background: linear-gradient(135deg, rgba(122,45,58,0.07), rgba(45,90,122,0.07));
+    border-radius: 12px;
+    padding: 10px 13px;
+    margin-top: 10px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    font-style: italic;
+    line-height: 1.55;
+    border: 1px solid rgba(180,130,80,0.15);
+  }
+
+  .play-again-btn {
+    background: transparent;
+    color: var(--burgundy);
+    border: 2px solid var(--burgundy);
+    border-radius: 50px;
+    padding: 12px 28px;
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    cursor: pointer;
+    width: 100%;
+    max-width: 420px;
+    margin-top: 8px;
+    transition: all 0.2s;
+  }
+  .play-again-btn:hover { background: var(--p1-light); }
+
+  .profile-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .profile-mini {
+    border-radius: 14px;
+    padding: 12px 12px;
+    font-size: 11.5px;
+    line-height: 1.6;
+  }
+  .profile-mini.p1 { background: var(--p1-light); border: 1.5px solid var(--p1-color); }
+  .profile-mini.p2 { background: var(--p2-light); border: 1.5px solid var(--p2-color); }
+  .profile-mini-name {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 7px;
+  }
+  .profile-mini.p1 .profile-mini-name { color: var(--p1-color); }
+  .profile-mini.p2 .profile-mini-name { color: var(--p2-color); }
+  .profile-answer {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 3px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    padding-bottom: 3px;
+  }
+  .profile-answer:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .profile-cat { color: var(--amber); font-weight: 700; font-size: 9.5px; letter-spacing: 0.8px; text-transform: uppercase; }
+  .profile-ans { color: var(--ink); font-size: 11px; }
+
+    background: #fff0f0;
+    border: 1px solid #e88;
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #a33;
+    margin-bottom: 12px;
+    width: 100%;
+    max-width: 420px;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ WELCOME SCREEN ══════════════ -->
+<div class="screen active" id="screen-welcome">
+  <div class="welcome-header">
+    <span class="candle-icon">🕯️</span>
+    <div class="title-main">The Book Date</div>
+    <div class="title-sub">a game for two bibliophiles in love</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">✦ Who's Playing?</div>
+    <div class="name-input-group">
+      <div class="player-dot p1-dot">📖</div>
+      <input type="text" id="p1-name" placeholder="Player 1's name" maxlength="20">
+    </div>
+    <div class="name-input-group" style="margin-bottom:0">
+      <div class="player-dot p2-dot">📚</div>
+      <input type="text" id="p2-name" placeholder="Player 2's name" maxlength="20">
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">✦ How to Play</div>
+    <ul class="how-it-works">
+      <li>You'll each answer <strong>16 questions</strong> about what you love in books</li>
+      <li>Pass the phone to each other when it's your turn</li>
+      <li>No peeking at each other's answers!</li>
+      <li>At the end, copy your reading profiles and <strong>paste into Claude</strong> for 3 perfect picks!</li>
+    </ul>
+  </div>
+
+  <button class="btn-primary" onclick="startGame()">Light the Candle ✦</button>
+</div>
+
+<!-- ══════════════ PASS PHONE SCREEN ══════════════ -->
+<div class="screen" id="screen-pass">
+  <div class="pass-screen-inner">
+    <div class="pass-emoji" id="pass-emoji">📱</div>
+    <div class="pass-name" id="pass-name">Player Name</div>
+    <div class="pass-sub" id="pass-sub">It's your turn!<br>Ready to answer?</div>
+    <button class="btn-primary" style="max-width:300px" onclick="beginQuestions()">I'm Ready ✦</button>
+  </div>
+</div>
+
+<!-- ══════════════ QUESTION SCREEN ══════════════ -->
+<div class="screen" id="screen-question">
+  <div class="q-header">
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+    <div class="q-meta">
+      <span class="player-badge" id="player-badge">Player 1</span>
+      <span id="q-counter">Question 1 of 8</span>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <div class="q-category" id="q-category">Mood</div>
+    <div class="q-text" id="q-text">What vibe are you craving?</div>
+    <div class="options-grid" id="options-container"></div>
+  </div>
+
+  <button class="btn-primary" id="btn-next" onclick="nextQuestion()" disabled>Next →</button>
+</div>
+
+<!-- ══════════════ PROFILE SCREEN ══════════════ -->
+<div class="screen" id="screen-profile">
+  <div class="results-header">
+    <div style="font-size:42px;margin-bottom:8px">📋</div>
+    <div class="results-title">Your Reading Profiles</div>
+    <div class="results-sub" id="profile-names">ready to paste into Claude</div>
+  </div>
+  <div class="divider">✦</div>
+
+  <!-- Player summaries side by side -->
+  <div id="profile-cards-container" style="width:100%;max-width:420px;margin-bottom:16px;"></div>
+
+  <!-- Claude prompt box -->
+  <div class="card" style="margin-bottom:12px;">
+    <div class="card-title">✦ Copy This Into Claude Chat</div>
+    <p style="font-size:12.5px;color:var(--ink-soft);font-style:italic;margin-bottom:12px;line-height:1.55;">
+      Tap the box to select all, then copy &amp; paste it into a new Claude message to get your 3 book picks!
+    </p>
+    <textarea id="claude-prompt" readonly onclick="this.select()"
+      style="width:100%;min-height:180px;border:1.5px solid rgba(180,130,80,0.3);border-radius:12px;
+             padding:12px;font-family:'Lora',serif;font-size:12px;color:var(--ink);
+             background:var(--cream);resize:none;line-height:1.6;outline:none;
+             cursor:pointer;"></textarea>
+  </div>
+
+  <button class="btn-primary" id="btn-copy" onclick="copyPrompt()">📋 Copy to Clipboard</button>
+  <div id="copy-confirm" style="font-size:13px;color:var(--amber);font-style:italic;text-align:center;margin-top:8px;min-height:20px;"></div>
+  <button class="play-again-btn" onclick="playAgain()">↩ Play Again</button>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  QUESTIONS
+// ══════════════════════════════════════════
+const QUESTIONS = [
+  {
+    category: "The Vibe",
+    text: "What reading mood are you in right now?",
+    options: [
+      { emoji: "🌙", label: "Dark & Brooding" },
+      { emoji: "☀️", label: "Warm & Cosy" },
+      { emoji: "⚡", label: "Gripping & Tense" },
+      { emoji: "🌸", label: "Romantic & Tender" },
+    ]
+  },
+  {
+    category: "The Genre",
+    text: "Which shelf calls your name most?",
+    options: [
+      { emoji: "🗡️", label: "Fantasy / Sci-Fi" },
+      { emoji: "💔", label: "Literary Fiction" },
+      { emoji: "🔪", label: "Thriller / Crime" },
+      { emoji: "🌍", label: "Historical Fiction" },
+    ]
+  },
+  {
+    category: "The Genre (2)",
+    text: "Now pick your runner-up genre…",
+    options: [
+      { emoji: "💌", label: "Romance" },
+      { emoji: "🧠", label: "Self-Help / Personal Growth" },
+      { emoji: "📜", label: "Biography / Memoir" },
+      { emoji: "🌿", label: "Nature / Philosophy" },
+    ]
+  },
+  {
+    category: "Romance Depth",
+    text: "When it comes to love in a book…",
+    options: [
+      { emoji: "🔥", label: "Front & centre — give me the full love story" },
+      { emoji: "🌹", label: "A slow burn in the background" },
+      { emoji: "💥", label: "Enemies to lovers, obviously" },
+      { emoji: "📵", label: "Keep it out — I'm here for the plot" },
+    ]
+  },
+  {
+    category: "Self-Help Flavour",
+    text: "If you read self-help or non-fiction, what draws you in?",
+    options: [
+      { emoji: "🧘", label: "Mindset & inner peace" },
+      { emoji: "💼", label: "Productivity & success" },
+      { emoji: "💞", label: "Relationships & communication" },
+      { emoji: "🔬", label: "Science-backed insights" },
+    ]
+  },
+  {
+    category: "Dark Themes",
+    text: "How dark can a book get before you tap out?",
+    options: [
+      { emoji: "🌑", label: "Go as dark as you dare" },
+      { emoji: "🌒", label: "Dark is fine if there's hope" },
+      { emoji: "🌤️", label: "A little tension, nothing too heavy" },
+      { emoji: "☀️", label: "Keep it light — life's tough enough" },
+    ]
+  },
+  {
+    category: "The World",
+    text: "Where do you want to be transported?",
+    options: [
+      { emoji: "🏙️", label: "Real & Contemporary" },
+      { emoji: "🏰", label: "Historical Past" },
+      { emoji: "🌌", label: "Fantasy Realm" },
+      { emoji: "🚀", label: "Sci-Fi Future" },
+    ]
+  },
+  {
+    category: "The Pace",
+    text: "How do you like the story to move?",
+    options: [
+      { emoji: "🔥", label: "Fast & Urgent" },
+      { emoji: "🍵", label: "Slow & Immersive" },
+      { emoji: "🌊", label: "Ebb & Flow" },
+      { emoji: "🎭", label: "Plot-Twisty" },
+    ]
+  },
+  {
+    category: "The Narrator",
+    text: "What narrative style pulls you in?",
+    options: [
+      { emoji: "🗣️", label: "First person — get inside their head" },
+      { emoji: "👁️", label: "Third person — bird's eye view" },
+      { emoji: "🎭", label: "Multiple POVs — every perspective" },
+      { emoji: "🎲", label: "Whatever serves the story" },
+    ]
+  },
+  {
+    category: "The Hero",
+    text: "What kind of main character speaks to you?",
+    options: [
+      { emoji: "💭", label: "Complex & Flawed" },
+      { emoji: "🗡️", label: "Bold & Heroic" },
+      { emoji: "🕵️", label: "Clever & Cunning" },
+      { emoji: "💞", label: "Heart-on-Sleeve" },
+    ]
+  },
+  {
+    category: "The Heart",
+    text: "What deeper theme moves you most?",
+    options: [
+      { emoji: "❤️", label: "Love & Connection" },
+      { emoji: "🔍", label: "Truth & Justice" },
+      { emoji: "🌱", label: "Growth & Healing" },
+      { emoji: "🧩", label: "Identity & Belonging" },
+    ]
+  },
+  {
+    category: "More Themes",
+    text: "And which of these also speaks to you?",
+    options: [
+      { emoji: "🌏", label: "Culture & Society" },
+      { emoji: "⚔️", label: "Power & Survival" },
+      { emoji: "🕊️", label: "Loss & Grief" },
+      { emoji: "✨", label: "Magic & Wonder" },
+    ]
+  },
+  {
+    category: "The Length",
+    text: "How big is your appetite right now?",
+    options: [
+      { emoji: "🥐", label: "Short & Sweet (< 300 pages)" },
+      { emoji: "🍽️", label: "Just Right (300–500 pages)" },
+      { emoji: "🏔️", label: "Epic Journey (500+ pages)" },
+      { emoji: "🎲", label: "Surprise me!" },
+    ]
+  },
+  {
+    category: "Series or Standalone",
+    text: "Are you in it for the long haul?",
+    options: [
+      { emoji: "📗", label: "Standalone — complete in one book" },
+      { emoji: "📚", label: "Series — I want to stay in this world" },
+      { emoji: "🔁", label: "Companion novels — loose connections" },
+      { emoji: "🤷", label: "Doesn't matter to me" },
+    ]
+  },
+  {
+    category: "The Feeling",
+    text: "How do you want to feel after the last page?",
+    options: [
+      { emoji: "😢", label: "Wrecked & Moved" },
+      { emoji: "😊", label: "Warm & Satisfied" },
+      { emoji: "🤯", label: "Mind Blown" },
+      { emoji: "💪", label: "Inspired & Ready" },
+    ]
+  },
+  {
+    category: "Your Shelf",
+    text: "One last thing — what's your secret reading confession?",
+    options: [
+      { emoji: "📖", label: "I always reread my favourites" },
+      { emoji: "💎", label: "I hunt for hidden gems only" },
+      { emoji: "🆕", label: "I only read new releases" },
+      { emoji: "🙈", label: "I judge books by their covers" },
+    ]
+  }
+];
+
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+let state = {
+  p1Name: 'Player 1',
+  p2Name: 'Player 2',
+  currentPlayer: 1,
+  currentQ: 0,
+  answers: { 1: [], 2: [] },
+  selected: null
+};
+
+// ══════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function pName(p) { return p === 1 ? state.p1Name : state.p2Name; }
+
+// ══════════════════════════════════════════
+//  GAME FLOW
+// ══════════════════════════════════════════
+function startGame() {
+  const n1 = document.getElementById('p1-name').value.trim();
+  const n2 = document.getElementById('p2-name').value.trim();
+  state.p1Name = n1 || 'Player 1';
+  state.p2Name = n2 || 'Player 2';
+  state.currentPlayer = 1;
+  state.currentQ = 0;
+  state.answers = { 1: [], 2: [] };
+  showPassScreen();
+}
+
+function showPassScreen() {
+  const p = state.currentPlayer;
+  const isFirst = p === 1 && state.answers[1].length === 0;
+
+  document.getElementById('pass-emoji').textContent = p === 1 ? '📖' : '📚';
+  document.getElementById('pass-name').textContent = pName(p) + "'s Turn";
+
+  if (isFirst) {
+    document.getElementById('pass-sub').textContent = "You'll answer 16 quick questions.\nNo peeking!";
+  } else {
+    document.getElementById('pass-sub').textContent = "Pass the phone!\nIt's their turn now.";
+  }
+  show('screen-pass');
+}
+
+function beginQuestions() {
+  state.currentQ = 0;
+  state.selected = null;
+  renderQuestion();
+  show('screen-question');
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[state.currentQ];
+  const p = state.currentPlayer;
+  const total = QUESTIONS.length;
+
+  // progress
+  const pct = (state.currentQ / total) * 100;
+  const fill = document.getElementById('progress-fill');
+  fill.style.width = pct + '%';
+  fill.className = 'progress-bar-fill ' + (p === 1 ? 'p1-fill' : 'p2-fill');
+
+  // meta
+  const badge = document.getElementById('player-badge');
+  badge.textContent = pName(p);
+  badge.className = 'player-badge ' + (p === 1 ? 'p1-badge' : 'p2-badge');
+  document.getElementById('q-counter').textContent = `Question ${state.currentQ + 1} of ${total}`;
+
+  // question
+  document.getElementById('q-category').textContent = q.category;
+  document.getElementById('q-text').textContent = q.text;
+
+  // options
+  const container = document.getElementById('options-container');
+  container.innerHTML = '';
+  container.className = 'options-grid';
+
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="opt-emoji">${opt.emoji}</span>${opt.label}`;
+    btn.onclick = () => selectOption(i, btn);
+    container.appendChild(btn);
+  });
+
+  state.selected = null;
+  document.getElementById('btn-next').disabled = true;
+}
+
+function selectOption(idx, btn) {
+  const p = state.currentPlayer;
+  document.querySelectorAll('.option-btn').forEach(b => {
+    b.className = 'option-btn';
+  });
+  btn.className = 'option-btn ' + (p === 1 ? 'p1-selected' : 'p2-selected');
+  state.selected = idx;
+  document.getElementById('btn-next').disabled = false;
+}
+
+function nextQuestion() {
+  if (state.selected === null) return;
+
+  const q = QUESTIONS[state.currentQ];
+  const answer = q.options[state.selected];
+  state.answers[state.currentPlayer].push({
+    question: q.text,
+    category: q.category,
+    answer: answer.label
+  });
+
+  state.currentQ++;
+
+  if (state.currentQ >= QUESTIONS.length) {
+    // done with current player
+    if (state.currentPlayer === 1) {
+      state.currentPlayer = 2;
+      state.currentQ = 0;
+      showPassScreen();
+    } else {
+      // both done - show profile & copy screen
+      buildProfileScreen();
+      show('screen-profile');
+    }
+  } else {
+    renderQuestion();
+  }
+}
+
+function playAgain() {
+  state = { p1Name: 'Player 1', p2Name: 'Player 2', currentPlayer: 1, currentQ: 0, answers: {1:[],2:[]}, selected: null };
+  document.getElementById('p1-name').value = '';
+  document.getElementById('p2-name').value = '';
+  show('screen-welcome');
+}
+
+// ══════════════════════════════════════════
+//  PROFILE SCREEN & COPY TO CLAUDE
+// ══════════════════════════════════════════
+function buildProfileScreen() {
+  document.getElementById('profile-names').textContent =
+    `${state.p1Name} & ${state.p2Name}`;
+
+  // Build side-by-side mini profile cards
+  const container = document.getElementById('profile-cards-container');
+  container.innerHTML = '';
+  const pair = document.createElement('div');
+  pair.className = 'profile-pair';
+
+  [1, 2].forEach(p => {
+    const div = document.createElement('div');
+    div.className = `profile-mini p${p}`;
+    const name = p === 1 ? state.p1Name : state.p2Name;
+    let html = `<div class="profile-mini-name">${name === ('Player '+p) ? '📖 '+name : name}</div>`;
+    state.answers[p].forEach(a => {
+      html += `<div class="profile-answer">
+        <span class="profile-cat">${a.category}</span>
+        <span class="profile-ans">${a.answer}</span>
+      </div>`;
+    });
+    div.innerHTML = html;
+    pair.appendChild(div);
+  });
+  container.appendChild(pair);
+
+  // Build the Claude prompt
+  const prompt = buildClaudePrompt();
+  document.getElementById('claude-prompt').value = prompt;
+}
+
+function buildClaudePrompt() {
+  const fmt = (answers) => answers.map(a => `  • ${a.category}: ${a.answer}`).join('\n');
+
+  return `Hi Claude! We just played The Book Date game together and need your help finding our perfect books. Based on our reading profiles below, please recommend exactly 3 books that would delight BOTH of us — finding the sweet spot where our tastes overlap. For each book please include the title, author, a 2–3 sentence description, 3–4 mood/genre tags, and one sentence explaining why we'll BOTH love it.
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+${state.p1Name.toUpperCase()}'S READING PROFILE
+━━━━━━━━━━━━━━━━━━━━━━━━
+${fmt(state.answers[1])}
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+${state.p2Name.toUpperCase()}'S READING PROFILE
+━━━━━━━━━━━━━━━━━━━━━━━━
+${fmt(state.answers[2])}
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+Please give us 3 real, well-known book recommendations that honour both our tastes. Make them genuinely exciting picks we might not have discovered on our own!`;
+}
+
+function copyPrompt() {
+  const text = document.getElementById('claude-prompt').value;
+  const confirm = document.getElementById('copy-confirm');
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      confirm.textContent = '✦ Copied! Now paste it into Claude chat ✦';
+      setTimeout(() => { confirm.textContent = ''; }, 3500);
+    }).catch(() => fallbackCopy(text, confirm));
+  } else {
+    fallbackCopy(text, confirm);
+  }
+}
+
+function fallbackCopy(text, confirm) {
+  const ta = document.getElementById('claude-prompt');
+  ta.select();
+  ta.setSelectionRange(0, 99999);
+  try {
+    document.execCommand('copy');
+    confirm.textContent = '✦ Copied! Now paste it into Claude chat ✦';
+    setTimeout(() => { confirm.textContent = ''; }, 3500);
+  } catch {
+    confirm.textContent = 'Tap the text box above, select all & copy manually.';
+  }
+}
+</script>
+</body>
+</html>
