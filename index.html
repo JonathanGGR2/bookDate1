@@ -210,7 +210,7 @@ input.config-input{font-size:13px;padding:10px 14px;margin-bottom:8px}
 <!-- ══════════════════════════════════════
      CONFIG SCREEN
 ══════════════════════════════════════ -->
-<div class="screen active" id="screen-config">
+<div class="screen" id="screen-config" style="display:none">
   <div class="logo-row" style="margin-top:8px">
     <span class="logo-icon">🎨</span>
     <span class="logo-title">Draw & Guess</span>
@@ -1219,7 +1219,7 @@ function spawnConfetti() {
 }
 
 // ══════════════════════════════════════════
-//  ENTER KEYS
+//  ENTER KEYS + AUTO FIREBASE INIT
 // ══════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('guess-input').addEventListener('keydown', e => {
@@ -1229,10 +1229,23 @@ document.addEventListener('DOMContentLoaded', () => {
     e.target.value = e.target.value.toUpperCase();
   });
 
-  // auto-load Firebase if config saved
-  const cfg = loadConfig();
-  if (cfg) {
-    initFirebase(cfg);
+  // Hardcoded Firebase config
+  const FIREBASE_CONFIG = {
+    apiKey:            "AIzaSyAGtCLRnXkQJK_ylH6aodRw_6_TmwIW8rM",
+    authDomain:        "loviesgame.firebaseapp.com",
+    databaseURL:       "https://loviesgame-default-rtdb.firebaseio.com",
+    projectId:         "loviesgame",
+    storageBucket:     "loviesgame.firebasestorage.app",
+    messagingSenderId: "1026003095875",
+    appId:             "1:1026003095875:web:2540da4ee66656d9941ff6"
+  };
+
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.database();
+    show('screen-home');
+  } catch(e) {
+    alert('Firebase error: ' + e.message);
   }
 });
 </script>
