@@ -197,6 +197,7 @@ input.config-input{font-size:13px;padding:10px 14px;margin-bottom:8px}
 /* confetti */
 .confetti-piece{position:fixed;width:10px;height:10px;border-radius:2px;pointer-events:none;z-index:300;animation:confettiFall var(--dur) ease forwards}
 @keyframes confettiFall{0%{transform:translate(0,0) rotate(0deg);opacity:1}100%{transform:translate(var(--tx),var(--ty)) rotate(var(--rot));opacity:0}}
+@keyframes heartbeat{0%,100%{transform:scale(1)}14%{transform:scale(1.3)}28%{transform:scale(1)}42%{transform:scale(1.15)}}
 
 /* toast */
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--chalk);color:var(--white);border-radius:12px;padding:12px 20px;font-size:14px;font-weight:700;z-index:500;transition:transform .3s ease;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.4)}
@@ -308,10 +309,11 @@ input.config-input{font-size:13px;padding:10px 14px;margin-bottom:8px}
 
   <div id="lobby-diff-section" style="width:100%;max-width:400px;display:none">
     <div style="font-family:'Fredoka One',cursive;font-size:15px;color:var(--white);margin-bottom:10px;text-align:center">Pick Difficulty</div>
-    <div class="diff-row">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
       <button class="diff-opt easy selected" onclick="setDiff('easy',this)">🟢 Easy</button>
-      <button class="diff-opt medium" onclick="setDiff('medium',this)">🟡 Med</button>
-      <button class="diff-opt hard"   onclick="setDiff('hard',this)">🔴 Hard</button>
+      <button class="diff-opt medium" onclick="setDiff('medium',this)">🟡 Medium</button>
+      <button class="diff-opt" onclick="setDiff('intermediate',this)" style="background:linear-gradient(135deg,#f07840,#c04820);color:white;opacity:0.5">🟠 Intermediate</button>
+      <button class="diff-opt hard" onclick="setDiff('hard',this)">🔴 Hard</button>
     </div>
     <button class="btn btn-green" onclick="startGame()" id="btn-start-game">🎮 Start Game!</button>
   </div>
@@ -327,7 +329,7 @@ input.config-input{font-size:13px;padding:10px 14px;margin-bottom:8px}
 ══════════════════════════════════════ -->
 <div class="screen" id="screen-draw">
   <div class="game-topbar">
-    <div class="round-pill">Round <span id="draw-round">1</span>/5</div>
+    <div class="round-pill">Round <span id="draw-round">1</span>/6</div>
     <div class="role-pill drawer">🎨 Drawing</div>
     <div class="score-pill">⭐ <span id="draw-score">0</span></div>
   </div>
@@ -367,7 +369,7 @@ input.config-input{font-size:13px;padding:10px 14px;margin-bottom:8px}
 ══════════════════════════════════════ -->
 <div class="screen" id="screen-guess">
   <div class="game-topbar">
-    <div class="round-pill">Round <span id="guess-round">1</span>/5</div>
+    <div class="round-pill">Round <span id="guess-round">1</span>/6</div>
     <div class="role-pill guesser">💡 Guessing</div>
     <div class="score-pill">⭐ <span id="guess-score">0</span></div>
   </div>
@@ -422,6 +424,30 @@ input.config-input{font-size:13px;padding:10px 14px;margin-bottom:8px}
 </div>
 
 <!-- ══════════════════════════════════════
+     PHOTO MOMENT SCREEN
+══════════════════════════════════════ -->
+<div class="screen" id="screen-photo" style="background:linear-gradient(135deg,#1a0a1a 0%,#2a0f1f 50%,#1a0a0a 100%);justify-content:flex-start;padding:20px 16px 40px;overflow-y:auto;-webkit-overflow-scrolling:touch">
+  <div style="text-align:center;width:100%;max-width:420px">
+    <div style="font-size:32px;margin-bottom:8px;animation:heartbeat 1.5s ease-in-out infinite">💝</div>
+    <div style="font-family:'Fredoka One',cursive;font-size:18px;color:#e8a0b4;margin-bottom:16px;letter-spacing:0.5px">A moment from Jonathan ✨</div>
+
+    <div style="border-radius:22px;overflow:hidden;box-shadow:0 8px 32px rgba(232,96,154,0.35);margin-bottom:18px;border:3px solid rgba(232,150,180,0.3);max-height:380px">
+      <img id="photo-img" src="" alt="Shanelle" style="width:100%;display:block;object-fit:cover;max-height:380px">
+    </div>
+
+    <div style="background:rgba(232,96,154,0.12);border:2px solid rgba(232,150,180,0.35);border-radius:20px;padding:16px 22px;margin-bottom:16px">
+      <div style="font-family:'Fredoka One',cursive;font-size:24px;color:#f0d0dc;text-align:center;line-height:1.3" id="photo-label">You are Simply Amazing</div>
+    </div>
+
+    <div style="font-size:12px;color:rgba(232,200,212,0.55);margin-bottom:16px">
+      Continuing in <span id="photo-countdown">7</span>s…
+    </div>
+
+    <button id="photo-continue-btn" class="btn" style="background:linear-gradient(135deg,#e8609a,#c04070);color:white;max-width:380px">Continue ❤️</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
      FINAL SCREEN
 ══════════════════════════════════════ -->
 <div class="screen" id="screen-final">
@@ -443,10 +469,61 @@ input.config-input{font-size:13px;padding:10px 14px;margin-bottom:8px}
 //  WORD BANKS
 // ══════════════════════════════════════════
 const WORDS = {
-  easy:   ['cat','dog','sun','fish','tree','house','bird','boat','star','ball','cake','hat','frog','heart','moon','drum','apple','cloud','bike','key'],
-  medium: ['elephant','rainbow','guitar','pizza','castle','volcano','robot','jellyfish','bicycle','telescope','umbrella','dragon','penguin','lighthouse','compass','waterfall','pineapple','tornado','pyramid','submarine'],
-  hard:   ['democracy','nostalgia','algorithm','constellation','archaeology','philosophy','metamorphosis','ecosystem','labyrinth','renaissance','symphony','kaleidoscope','bureaucracy','archipelago','photosynthesis','civilization','perpendicular','electricity','constitution','catastrophe']
+  easy: [
+    'cat','dog','sun','fish','tree','house','bird','boat','star','ball',
+    'cake','hat','frog','heart','moon','drum','apple','cloud','bike','key',
+    'flower','chair','book','phone','cup','car','rain','eye','nose','mouth',
+    'hand','foot','door','lamp','bed','shoe','sock','ring','flag','kite',
+    'snake','duck','pig','cow','lion','bear','fox','owl','bee','ant'
+  ],
+  medium: [
+    'elephant','rainbow','guitar','pizza','castle','volcano','robot','jellyfish',
+    'bicycle','telescope','umbrella','dragon','penguin','lighthouse','compass',
+    'waterfall','pineapple','tornado','pyramid','submarine','cactus','butterfly',
+    'surfboard','windmill','igloo','kangaroo','crocodile','popcorn','snowman','rocket',
+    'microphone','parachute','dinosaur','scorpion','flamingo','astronaut','detective',
+    'accordion','hammock','caterpillar','chameleon','trampoline','binoculars','octopus','mermaid'
+  ],
+  intermediate: [
+    'camping','birthday party','cooking','swimming','dancing','traffic jam',
+    'beach holiday','dog walking','haunted house','treasure hunt',
+    'hot air balloon','carnival','desert island','time travel','rocket launch',
+    'underwater city','jungle gym','pizza delivery','movie night','rainy day',
+    'snowstorm','sunrise','marathon','wedding','graduation',
+    'superhero','magic show','pirate ship','safari','mountain climbing',
+    'ice skating','fishing','gardening','yoga','sword fight'
+  ],
+  hard: [
+    'freedom','justice','peace','hope','anger','jealousy','confusion',
+    'bravery','wisdom','success','failure','dreams','memory','kindness',
+    'patience','courage','loneliness','friendship','celebration','imagination',
+    'nostalgia','gravity','evolution','meditation','revolution',
+    'bankruptcy','nightmare','inspiration','procrastination','invisibility',
+    'metamorphosis','catastrophe','renaissance','constellation','archaeology'
+  ]
 };
+
+const JAR_LABELS = [
+  'You are Kind','You are Considerate','You are Beautiful','You are Smart',
+  'You are so Sexy','Love your Laugh','Love your Smile','Love your Humour',
+  'Love your Touch','Love your Voice','You are my Best Friend',
+  'You make me a better person','Love your Passion','Love your Strength',
+  'You are Caring','You are Thoughtful','Love your Confidence','Love your Warmth',
+  'You are my Safe Place','Love the way you Love','You are Resilient',
+  'Love your Curiosity','You make every day Brighter','Love your Gentleness',
+  'You are Inspiring','Love your Eyes','You make me Smile every day',
+  'Love your Big Heart','You are my favourite Adventure','You are Simply Amazing'
+];
+
+const PHOTOS = [
+  'photos/shanelle-dogs.jpg',
+  'photos/shanelle-selfie.jpg',
+  'photos/shanelle-pony1.jpg',
+  'photos/shanelle-goat.jpg',
+  'photos/shanelle-lemon.jpg',
+  'photos/shanelle-hiking.jpg',
+  'photos/shanelle-pony2.jpg'
+];
 
 const COLORS = ['#1a1a1a','#e85555','#f5c842','#4caf7d','#4a90d9','#9b6fd4','#f07840','#e8609a'];
 
@@ -469,6 +546,9 @@ let syncTimer = null, lastSyncData = '';
 
 // timer
 let timerInterval = null;
+
+// photo moment
+let photoCountdownInterval = null;
 
 // ══════════════════════════════════════════
 //  FIREBASE CONFIG
@@ -617,6 +697,12 @@ function handleStateChange(gs) {
     return;
   }
 
+  // ── PHOTO REVEAL ──
+  if (gs.phase === 'photo-reveal') {
+    showPhotoReveal(gs);
+    return;
+  }
+
   // ── ROUND END ──
   if (gs.phase === 'round-end') {
     showRoundEnd(gs);
@@ -644,7 +730,7 @@ function setDiff(d, btn) {
 // ══════════════════════════════════════════
 async function startGame() {
   const diff = gameState.difficulty || 'easy';
-  const pool = [...WORDS[diff]].sort(() => Math.random() - 0.5).slice(0, 5);
+  const pool = [...WORDS[diff]].sort(() => Math.random() - 0.5).slice(0, 6);
   const uids = Object.keys(gameState.players || {});
   const drawer = uids[0]; // host draws first
 
@@ -688,7 +774,7 @@ function showDrawScreen(gs) {
   setTimeout(() => initDrawCanvas(gs), 80);
 
   // clear timer display
-  const timeLimit = gs.difficulty === 'easy' ? 90 : gs.difficulty === 'medium' ? 75 : 60;
+  const timeLimit = 90; // 90 seconds for all difficulty levels
   document.getElementById('draw-timer').textContent = timeLimit;
   document.getElementById('draw-timer').classList.remove('urgent');
   startTimerFor(timeLimit, 'draw-timer', () => {
@@ -883,8 +969,8 @@ function showGuessScreen(gs) {
     });
   }, 80);
 
-  // timer
-  const timeLimit = diff === 'easy' ? 90 : diff === 'medium' ? 75 : 60;
+  // timer — 90 seconds for all difficulty levels
+  const timeLimit = 90;
   document.getElementById('guess-timer').textContent = timeLimit;
   document.getElementById('guess-timer').classList.remove('urgent');
   startTimerFor(timeLimit, 'guess-timer', () => {
@@ -1068,6 +1154,7 @@ async function nextRound(switchRoles) {
   const uids    = Object.keys(gs.players || {});
   const newRound = gs.round + 1;
   const wordList = gs.wordList || [];
+  const isLast   = newRound >= wordList.length;
   const newWord  = wordList[newRound] || wordList[0];
 
   let newDrawer = gs.drawerId;
@@ -1075,23 +1162,27 @@ async function nextRound(switchRoles) {
     newDrawer = uids.find(u => u !== gs.drawerId) || gs.drawerId;
   }
 
-  // stop canvas listeners before clearing
   if (roomRef) {
     roomRef.child('canvas').off('value');
     roomRef.child('clearStamp').off('value');
   }
 
+  // Pick a photo and label for this round's moment
+  const photoIndex = gs.round % PHOTOS.length;
+  const label = JAR_LABELS[Math.floor(Math.random() * JAR_LABELS.length)];
+
   await roomRef.update({
-    phase: 'drawing',
-    round: newRound,
-    drawerId: newDrawer,
-    currentWord: newWord,
-    guessesLeft: 3,
-    solved: false,
-    timedOut: false,
-    wrongGuesses: [],
-    canvas: '',
-    clearStamp: Date.now()
+    phase: 'photo-reveal',
+    photoReveal: {
+      photoIndex,
+      label,
+      pendingFinal: isLast,
+      pendingRound: isLast ? null : {
+        round: newRound,
+        drawerId: newDrawer,
+        currentWord: newWord
+      }
+    }
   });
 }
 
@@ -1100,7 +1191,80 @@ async function finishGame() {
     roomRef.child('canvas').off('value');
     roomRef.child('clearStamp').off('value');
   }
-  await roomRef.child('phase').set('final');
+  // Show photo moment before final screen
+  const gs = gameState;
+  const photoIndex = gs.round % PHOTOS.length;
+  const label = JAR_LABELS[Math.floor(Math.random() * JAR_LABELS.length)];
+  await roomRef.update({
+    phase: 'photo-reveal',
+    photoReveal: { photoIndex, label, pendingFinal: true, pendingRound: null }
+  });
+}
+
+// ══════════════════════════════════════════
+//  PHOTO MOMENT
+// ══════════════════════════════════════════
+let _lastPhotoRevealTime = 0;
+
+function showPhotoReveal(gs) {
+  const reveal = gs.photoReveal || {};
+  // Debounce — don't re-show if already on photo screen
+  if (document.getElementById('screen-photo').classList.contains('active')) return;
+
+  const pi    = reveal.photoIndex ?? 0;
+  const label = reveal.label || 'You are Simply Amazing';
+  const img   = document.getElementById('photo-img');
+  const lbl   = document.getElementById('photo-label');
+  const cdn   = document.getElementById('photo-countdown');
+  const contBtn = document.getElementById('photo-continue-btn');
+
+  img.src = PHOTOS[pi % PHOTOS.length];
+  img.onerror = () => { img.src=''; img.style.display='none'; };
+  lbl.textContent = label;
+  show('screen-photo');
+
+  // Host gets Continue button; guest sees "Jonathan is continuing..."
+  if (isHost) {
+    contBtn.style.display = 'block';
+    contBtn.onclick = () => { clearInterval(photoCountdownInterval); proceedFromPhoto(reveal); };
+  } else {
+    contBtn.style.display = 'none';
+  }
+
+  let count = 7;
+  if (cdn) cdn.textContent = count;
+  if (photoCountdownInterval) clearInterval(photoCountdownInterval);
+  photoCountdownInterval = setInterval(() => {
+    count--;
+    if (cdn) cdn.textContent = count;
+    if (count <= 0) {
+      clearInterval(photoCountdownInterval);
+      if (isHost) proceedFromPhoto(reveal);
+    }
+  }, 1000);
+}
+
+async function proceedFromPhoto(reveal) {
+  if (!isHost || !roomRef) return;
+  if (reveal.pendingFinal) {
+    await roomRef.child('phase').set('final');
+  } else {
+    const pr = reveal.pendingRound;
+    if (pr) {
+      await roomRef.update({
+        phase: 'drawing',
+        round: pr.round,
+        drawerId: pr.drawerId,
+        currentWord: pr.currentWord,
+        guessesLeft: 3,
+        solved: false,
+        timedOut: false,
+        wrongGuesses: [],
+        canvas: '',
+        clearStamp: Date.now()
+      });
+    }
+  }
 }
 
 // ══════════════════════════════════════════
