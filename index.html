@@ -91,7 +91,7 @@ input[type=text]::placeholder{color:rgba(245,240,234,.3);font-weight:400}
 ════════════════════════════ */
 #screen-dg-home,#screen-dg-lobby{background:var(--board);justify-content:flex-start;padding:24px 16px 40px;align-items:center;overflow-y:auto;-webkit-overflow-scrolling:touch}
 #screen-dg-draw,#screen-dg-guess{background:var(--board);padding:0;justify-content:flex-start;overflow:hidden}
-#screen-dg-round-end{background:var(--board);justify-content:center;align-items:center;padding:24px 16px 40px}
+#screen-dg-round-end{background:var(--board);justify-content:flex-start;align-items:center;padding:24px 16px 40px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 #screen-dg-photo{background:linear-gradient(135deg,#1a0a1a 0%,#2a0f1f 50%,#1a0a0a 100%);justify-content:flex-start;padding:20px 16px 40px;overflow-y:auto;-webkit-overflow-scrolling:touch;align-items:center}
 #screen-dg-final{background:var(--board);justify-content:flex-start;padding:24px 16px 40px;align-items:center;overflow-y:auto}
 .dg-logo-row{display:flex;align-items:center;gap:10px;margin-bottom:22px}
@@ -204,22 +204,23 @@ input[type=text]::placeholder{color:rgba(245,240,234,.3);font-weight:400}
 .pz-s2{color:var(--teal)}
 
 /* Piece tray */
-.pz-tray-container{width:100%;flex-shrink:0;border-bottom:2px solid rgba(78,205,196,.12);background:rgba(0,0,0,.5)}
-.pz-tray-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:6px 12px 0;flex-shrink:0}
-.pz-tray{display:flex;flex-wrap:wrap;gap:6px;padding:8px 10px;overflow-y:auto;align-content:flex-start}
-.pz-piece{border-radius:6px;border:2.5px solid rgba(255,255,255,.2);cursor:grab;flex-shrink:0;background-repeat:no-repeat;transition:border-color .15s,box-shadow .15s;touch-action:none}
+.pz-tray-container{width:100%;flex-shrink:0;border-bottom:2px solid rgba(78,205,196,.15);background:rgba(0,0,0,.55)}
+.pz-tray-label{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);padding:5px 10px 0;flex-shrink:0}
+.pz-tray{display:flex;flex-wrap:wrap;gap:5px;padding:6px 8px;overflow-y:auto;-webkit-overflow-scrolling:touch;align-content:flex-start}
+.pz-piece{border-radius:5px;border:2px solid rgba(255,255,255,.3);cursor:grab;flex-shrink:0;background-repeat:no-repeat;transition:border-color .15s,box-shadow .15s,transform .15s;touch-action:none}
+.pz-piece:active{transform:scale(1.05)}
 .pz-piece.hinted{border-color:white;box-shadow:0 0 16px rgba(255,255,255,.8);animation:hintPulse 1s ease-in-out infinite}
 @keyframes hintPulse{0%,100%{box-shadow:0 0 10px rgba(255,255,255,.6)}50%{box-shadow:0 0 24px rgba(255,255,255,1)}}
-.pz-piece.dragging-src{opacity:.25}
+.pz-piece.dragging-src{opacity:.2}
 
 /* Puzzle board */
-.pz-board-container{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:8px}
-.pz-board{display:grid;border:2px solid rgba(78,205,196,.2);border-radius:8px;overflow:hidden}
-.pz-slot{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);position:relative;background-repeat:no-repeat;transition:background-color .2s}
-.pz-slot.placed{border-color:rgba(78,205,196,.3)}
-.pz-slot.wrong-flash{background:rgba(232,85,85,.3)!important;border-color:var(--red)!important}
-.pz-slot.correct-flash{background:rgba(78,205,196,.3)!important;border-color:var(--teal)!important}
-.pz-slot .placed-check{position:absolute;bottom:3px;right:3px;font-size:10px;line-height:1;background:rgba(0,0,0,.5);border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-weight:700}
+.pz-board-container{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:auto;padding:6px}
+.pz-board{display:grid;border:2px solid rgba(78,205,196,.4);border-radius:6px;overflow:hidden;box-shadow:0 0 24px rgba(78,205,196,.1)}
+.pz-slot{border:1.5px solid rgba(255,255,255,.22);background:rgba(255,255,255,.04);position:relative;background-repeat:no-repeat;transition:background-color .15s,border-color .15s}
+.pz-slot.placed{border-color:rgba(78,205,196,.6);background:none}
+.pz-slot.wrong-flash{background:rgba(232,85,85,.35)!important;border-color:var(--red)!important}
+.pz-slot.correct-flash{background:rgba(78,205,196,.35)!important;border-color:white!important}
+.pz-slot .placed-check{position:absolute;bottom:2px;right:2px;font-size:10px;line-height:1;background:rgba(0,0,0,.6);border-radius:50%;width:15px;height:15px;display:flex;align-items:center;justify-content:center;font-weight:700}
 .pz-placed-by-p1 .placed-check{color:var(--rose)}
 .pz-placed-by-p2 .placed-check{color:var(--teal)}
 
@@ -228,7 +229,11 @@ input[type=text]::placeholder{color:rgba(245,240,234,.3);font-weight:400}
 .pz-progress-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--violet));transition:width .4s ease}
 
 /* Drag clone (fixed, follows finger) */
-#pz-drag-clone{position:fixed;z-index:999;pointer-events:none;border-radius:6px;border:3px solid var(--teal);box-shadow:0 8px 24px rgba(78,205,196,.4);opacity:.9;transform:scale(1.12);background-repeat:no-repeat;display:none}
+#pz-drag-clone{position:fixed;z-index:999;pointer-events:none;border-radius:5px;border:3px solid var(--teal);box-shadow:0 8px 24px rgba(78,205,196,.5);opacity:.92;transform:scale(1.1);background-repeat:no-repeat;display:none;transition:none}
+
+/* Bounce-back animation */
+@keyframes pzBounce{0%{transform:scale(1.1)}30%{transform:scale(1.2)}100%{transform:scale(1.1)}}
+.pz-drag-clone-bounce{animation:pzBounce .25s ease}
 
 /* Hint toast */
 .pz-hint-msg{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.15);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.3);color:white;border-radius:12px;padding:8px 16px;font-size:13px;font-weight:700;z-index:500;pointer-events:none;white-space:nowrap;display:none}
@@ -238,6 +243,9 @@ input[type=text]::placeholder{color:rgba(245,240,234,.3);font-weight:400}
 .pz-complete-icon{font-size:60px;margin-bottom:10px}
 .pz-complete-title{font-family:'Fredoka One',cursive;font-size:36px;color:var(--teal);text-shadow:0 0 20px rgba(78,205,196,.4);margin-bottom:4px}
 .pz-final-scores{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:380px;margin:16px 0}
+
+/* Select screen MUST scroll on mobile */
+#screen-pz-select{height:100vh!important;min-height:unset!important;overflow-y:scroll!important;-webkit-overflow-scrolling:touch!important;justify-content:flex-start}
 </style>
 </head>
 <body>
@@ -265,7 +273,7 @@ input[type=text]::placeholder{color:rgba(245,240,234,.3);font-weight:400}
       <div class="gc-title">Jigsaw Puzzle</div>
       <div class="gc-desc">Take turns placing pieces. Drag from the tray to the board. Tap to hint your partner.</div>
     </div>
-    <div class="gc-badge">2 PLAYERS</div>
+    <div class="gc-badge">1-2 PLAYERS</div>
   </div>
 </div>
 
@@ -430,7 +438,8 @@ input[type=text]::placeholder{color:rgba(245,240,234,.3);font-weight:400}
     <div class="player-slot" id="pz-slot-p2-box"><div class="ps-emoji" id="pz-slot-p2-emoji">⏳</div><div class="ps-name" id="pz-slot-p2">Waiting…</div><div class="ps-role">Guest</div></div>
   </div>
   <div id="pz-lobby-ready" style="width:100%;max-width:400px;display:none">
-    <button class="btn btn-teal" onclick="pzGoToSelect()">🖼️ Choose Photo &amp; Difficulty →</button>
+    <button class="btn btn-teal" onclick="pzGoToSelect()">🖼️ Play Together — Choose Photo →</button>
+    <button class="btn btn-ghost" style="font-size:14px" onclick="pzGoSolo()">🎮 Play Solo (test)</button>
   </div>
   <div id="pz-lobby-wait" class="waiting-pulse"><div class="pulse-dot"></div><span>Waiting for your partner…</span></div>
 </div>
@@ -473,7 +482,7 @@ input[type=text]::placeholder{color:rgba(245,240,234,.3);font-weight:400}
   </div>
 </div>
 
-<div class="screen" id="screen-pz-complete">
+<div class="screen" id="screen-pz-complete" style="overflow-y:auto;-webkit-overflow-scrolling:touch;justify-content:flex-start;padding:24px 16px 40px">
   <div class="pz-complete-icon">🎉</div>
   <div class="pz-complete-title">Puzzle Complete!</div>
   <div style="font-size:13px;color:var(--muted);margin-bottom:6px" id="pz-complete-sub">Amazing teamwork!</div>
@@ -605,7 +614,7 @@ function dgHandleState(gs){
   if(gs.phase==='round-end'){dgShowRoundEnd(gs);return;}
   if(gs.phase==='final'){dgShowFinal(gs);return;}
 }
-function dgSetDiff(d,btn){document.querySelectorAll('.diff-opt').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');dgRoomRef.child('difficulty').set(d);}
+function dgSetDiff(d,btn){document.querySelectorAll('#screen-dg-lobby .diff-opt').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');dgRoomRef.child('difficulty').set(d);}
 async function dgStartGame(){
   const diff=dgGameState.difficulty||'easy';
   const pool=[...DG_WORDS[diff]].sort(()=>Math.random()-.5).slice(0,6);
@@ -818,6 +827,7 @@ let pzRoomRef=null, pzRoomCode='', pzMyName='', pzIsHost=false, pzGameState={};
 let pzSelectedPhoto='', pzSelectedGrid=3, pzPieceSize=0;
 let pzDragging=null, pzDragClone=null, pzDragOffX=0, pzDragOffY=0;
 let pzHintTimer=null, pzLoadedImg=null;
+let pzSoloMode=false;
 
 // ══════════════════════════════════════════
 //  PUZZLE — ROOMS
@@ -832,6 +842,9 @@ async function pzCreateRoom(){
   pzRoomRef.onDisconnect().remove();
   document.getElementById('pz-lobby-code').textContent=pzRoomCode;
   document.getElementById('pz-slot-p1').textContent=pzMyName;
+  // Host can always start (solo or wait for partner)
+  document.getElementById('pz-lobby-wait').style.display='none';
+  document.getElementById('pz-lobby-ready').style.display='block';
   pzListenRoom(); show('screen-pz-lobby');
 }
 async function pzJoinRoom(){
@@ -861,7 +874,10 @@ function pzHandleState(gs){
     const names=uids.map(u=>gs.players[u].name);
     document.getElementById('pz-slot-p1').textContent=names[0]||'—';
     if(names[1]){document.getElementById('pz-slot-p2').textContent=names[1];document.getElementById('pz-slot-p2-emoji').textContent='🧩';document.getElementById('pz-slot-p2-box').classList.add('filled');}
-    if(pzIsHost&&uids.length>=2){document.getElementById('pz-lobby-wait').style.display='none';document.getElementById('pz-lobby-ready').style.display='block';}
+    if(pzIsHost){
+      document.getElementById('pz-lobby-wait').style.display='none';
+      document.getElementById('pz-lobby-ready').style.display='block';
+    }
     return;
   }
   if(gs.phase==='select'){if(pzIsHost)show('screen-pz-select');else{show('screen-pz-lobby');document.getElementById('pz-lobby-wait').innerHTML='<div class="pulse-dot"></div><span>Host is choosing a photo…</span>';document.getElementById('pz-lobby-wait').style.display='flex';}return;}
@@ -869,8 +885,9 @@ function pzHandleState(gs){
   if(gs.phase==='complete'){pzShowComplete(gs);return;}
 }
 function copyPZCode(){navigator.clipboard.writeText(pzRoomCode).then(()=>showToast('📋 Copied!'));}
-function pzGoToSelect(){pzRoomRef.child('phase').set('select');}
-function pzPlayAgain(){if(pzRoomRef)pzRoomRef.off();pzRoomRef=null;pzLoadedImg=null;show('screen-pz-home');}
+function pzGoToSelect(){pzSoloMode=false;pzRoomRef.child('phase').set('select');}
+function pzGoSolo(){pzSoloMode=true;pzRoomRef.child('phase').set('select');}
+function pzPlayAgain(){if(pzRoomRef)pzRoomRef.off();pzRoomRef=null;pzLoadedImg=null;pzSoloMode=false;show('screen-pz-home');}
 
 // ══════════════════════════════════════════
 //  PUZZLE — SELECTION
@@ -883,7 +900,7 @@ function pzSelectPhoto(id,el){
 }
 function pzSetDiff(d,g,btn){
   pzSelectedGrid=g;
-  document.querySelectorAll('.diff-opt').forEach(b=>b.classList.remove('selected'));
+  document.querySelectorAll('#screen-pz-select .diff-opt').forEach(b=>b.classList.remove('selected'));
   btn.classList.add('selected');
 }
 async function pzStartGame(){
@@ -902,7 +919,10 @@ async function pzStartGame(){
 function pzEnterGame(gs){
   if(!document.getElementById('screen-pz-game').classList.contains('active')){
     show('screen-pz-game');
-    pzLoadImage(gs).then(()=>pzRenderAll(gs));
+    // Allow layout to settle before computing piece sizes
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      pzLoadImage(gs).then(()=>pzRenderAll(gs));
+    }));
   } else {
     pzRenderAll(gs);
   }
@@ -929,22 +949,25 @@ function pzRenderAll(gs){
 
 function pzRenderTopBar(gs){
   const uids=Object.keys(gs.players||{});
-  const isMyTurn=gs.currentTurn===myUid;
+  const isMyTurn=pzSoloMode||(gs.currentTurn===myUid);
   const tb=document.getElementById('pz-turn-badge');
-  if(isMyTurn){tb.textContent='✨ Your turn — place a piece!';tb.className='pz-turn-badge my-turn';}
+  if(pzSoloMode){tb.textContent='🧩 Solo — place any piece!';tb.className='pz-turn-badge my-turn';}
+  else if(isMyTurn){tb.textContent='✨ Your turn — place a piece!';tb.className='pz-turn-badge my-turn';}
   else{const other=(gs.players||{})[gs.currentTurn];tb.textContent=`⏳ ${other?.name||'Partner'}'s turn`;tb.className='pz-turn-badge their-turn';}
   const placed=Object.keys(gs.placed||{}).length, total=gs.totalPieces||9;
   document.getElementById('pz-progress-text').textContent=`${placed} / ${total} placed`;
   document.getElementById('pz-progress-fill').style.width=`${(placed/total)*100}%`;
-  // Scores
   const p1uid=uids[0], p2uid=uids[1];
-  document.getElementById('pz-score-p1').textContent=`${(gs.players||{})[p1uid]?.name||'P1'}: ${(gs.players||{})[p1uid]?.score||0}`;
-  document.getElementById('pz-score-p2').textContent=`${(gs.players||{})[p2uid]?.name||'P2'}: ${(gs.players||{})[p2uid]?.score||0}`;
-  // Tray instruction
+  if(pzSoloMode){
+    document.getElementById('pz-score-p1').textContent=`${(gs.players||{})[p1uid]?.name||'You'}: ${(gs.players||{})[p1uid]?.score||0} pieces`;
+    document.getElementById('pz-score-p2').textContent='';
+  } else {
+    document.getElementById('pz-score-p1').textContent=`${(gs.players||{})[p1uid]?.name||'P1'}: ${(gs.players||{})[p1uid]?.score||0}`;
+    document.getElementById('pz-score-p2').textContent=`${(gs.players||{})[p2uid]?.name||'P2'}: ${(gs.players||{})[p2uid]?.score||0}`;
+  }
   const ti=document.getElementById('pz-tray-instruction');
-  if(gs.currentTurn===myUid) ti.textContent='drag a piece to its spot on the board';
-  else ti.textContent='tap a piece to hint your partner';
-  // Hint display
+  if(pzSoloMode||gs.currentTurn===myUid) ti.textContent='drag a piece to its correct spot on the board';
+  else ti.textContent='tap a piece to send a hint 💡';
   const hint=gs.hint;
   const hm=document.getElementById('pz-hint-msg');
   if(hint&&hint.by!==myUid&&hint.pieceId){
@@ -956,9 +979,12 @@ function pzRenderTopBar(gs){
 }
 
 function pzComputePieceSize(gridSize){
-  const boardEl=document.getElementById('pz-board');
-  const avail=boardEl.parentElement.clientWidth-16;
-  return Math.floor(avail/gridSize);
+  const boardContainer=document.getElementById('pz-board-container');
+  const aw=Math.max(200, boardContainer.clientWidth-12);
+  const ah=Math.max(200, boardContainer.clientHeight-12);
+  const byW=Math.floor(aw/gridSize);
+  const byH=Math.floor(ah/gridSize);
+  return Math.max(28, Math.min(byW, byH));
 }
 
 function pzRenderBoard(gs){
@@ -994,13 +1020,13 @@ function pzRenderBoard(gs){
         slot.classList.add(placerIsP1?'pz-placed-by-p1':'pz-placed-by-p2');
         const ck=document.createElement('div');ck.className='placed-check';ck.textContent='✓';slot.appendChild(ck);
       } else {
-        // Guide lines (very faint)
+        // Faint guide image + clear grid border lines
         slot.style.backgroundImage=`url('${imgSrc}')`;
         slot.style.backgroundSize=`${totalImgSize}px ${totalImgSize}px`;
         slot.style.backgroundPosition=`-${c*ps}px -${r*ps}px`;
-        slot.style.opacity='0.12';
+        // Dark overlay dims the guide WITHOUT touching the border opacity
         const overlay=document.createElement('div');
-        overlay.style.cssText='position:absolute;inset:0;background:rgba(10,10,18,0.88);';
+        overlay.style.cssText='position:absolute;inset:0;background:rgba(8,8,16,0.87);pointer-events:none;';
         slot.appendChild(overlay);
       }
       board.appendChild(slot);
@@ -1015,17 +1041,18 @@ function pzRenderTray(gs){
   const hint=gs.hint;
   const photo=PZ_PHOTOS[gs.imageId];
   const imgSrc=photo?.src||'';
-  const isMyTurn=gs.currentTurn===myUid;
+  const isSolo=pzSoloMode;
+  const isMyTurn=isSolo||(gs.currentTurn===myUid);
 
-  // Piece size in tray
-  const ps=Math.min(72, Math.floor((window.innerWidth-28)/(Math.ceil(Math.sqrt(gs.totalPieces||9)))));
+  // Tray piece size: fit cols across width, cap at comfortable touch size
+  const screenW=window.innerWidth;
+  const cols=Math.min(g, Math.ceil(Math.sqrt(gs.totalPieces||9)));
+  const ps=Math.max(44, Math.min(68, Math.floor((screenW-20)/cols)-6));
   const totalImgSize=g*ps;
 
-  // Tray height = 2.5 rows of pieces
-  const trayContainer=document.getElementById('pz-tray-container');
-  const trayEl=document.getElementById('pz-tray');
-  const rowHeight=ps+10;
-  trayEl.style.maxHeight=(rowHeight*2.5)+'px';
+  // Set tray max height to ~2.5 rows
+  const rowH=ps+6;
+  document.getElementById('pz-tray').style.maxHeight=(rowH*2.5+8)+'px';
 
   tray.innerHTML='';
   const pieces=gs.pieces||[];
@@ -1102,26 +1129,41 @@ function pzEndDrag(cx,cy){
   pzDragClone.style.display='none';
   const el=document.elementFromPoint(cx,cy);
   pzDragClone.style.display='block';
-  let placed=false;
   if(el){
     const slot=el.closest('.pz-slot');
-    if(slot){
+    if(slot&&!slot.classList.contains('placed')){
       const slotId=slot.dataset.id;
-      if(slotId===pzDragging&&!slot.classList.contains('placed')){
-        // Correct!
+      if(slotId===pzDragging){
+        // ✅ Correct slot — place it!
         pzPlacePiece(pzDragging);
         slot.classList.add('correct-flash');
-        setTimeout(()=>slot.classList.remove('correct-flash'),600);
+        setTimeout(()=>slot.classList.remove('correct-flash'),700);
         spawnConfetti();
-        placed=true;
-      } else if(!slot.classList.contains('placed')){
-        // Wrong slot — flash red
+        pzCleanDrag(); return;
+      } else {
+        // ❌ Wrong slot — flash red then bounce back
         slot.classList.add('wrong-flash');
         setTimeout(()=>slot.classList.remove('wrong-flash'),500);
       }
     }
   }
-  pzCleanDrag();
+  // Bounce piece back to tray with animation
+  pzBounceBack();
+}
+function pzBounceBack(){
+  const orig=document.getElementById('tray-p-'+(pzDragging||''));
+  const clone=pzDragClone; // capture before timeout
+  if(!orig||!clone){pzCleanDrag();return;}
+  const or=orig.getBoundingClientRect();
+  const targetX=or.left+or.width/2-clone.offsetWidth/2;
+  const targetY=or.top+or.height/2-clone.offsetHeight/2;
+  clone.style.transition='left .3s cubic-bezier(.4,0,.2,1),top .3s cubic-bezier(.4,0,.2,1),opacity .3s';
+  clone.style.left=targetX+'px'; clone.style.top=targetY+'px'; clone.style.opacity='0';
+  setTimeout(()=>{
+    orig.classList.remove('dragging-src');
+    clone.style.transition=''; clone.style.display='none'; clone.style.opacity='.92';
+    pzDragging=null; pzDragClone=null;
+  },320);
 }
 function pzCleanDrag(){
   if(pzDragClone) pzDragClone.style.display='none';
@@ -1153,7 +1195,8 @@ async function pzPlacePiece(pieceId){
   if(!pzRoomRef||!pzGameState)return;
   const gs=pzGameState;
   const uids=Object.keys(gs.players||{});
-  const nextTurn=uids.find(u=>u!==myUid)||uids[0];
+  // In solo mode, turn stays with the same player
+  const nextTurn=pzSoloMode ? myUid : (uids.find(u=>u!==myUid)||uids[0]);
   const newScore=((gs.players||{})[myUid]?.score||0)+1;
   const placed={...(gs.placed||{}),[pieceId]:myUid};
   const isComplete=Object.keys(placed).length>=(gs.totalPieces||9);
@@ -1178,10 +1221,18 @@ function pzShowComplete(gs){
   const photo=PZ_PHOTOS[gs.imageId];
   document.getElementById('pz-complete-img').src=photo?.src||'';
   const uids=Object.keys(gs.players||{}).sort((a,b)=>(gs.players[b]?.score||0)-(gs.players[a]?.score||0));
-  const tied=(gs.players[uids[0]]?.score||0)===(gs.players[uids[1]]?.score||0);
-  document.getElementById('pz-complete-sub').textContent=tied?`${photo?.label} — and it was a tie! 🤝`:`${photo?.label} — ${gs.players[uids[0]]?.name} wins! 🎉`;
-  const sc=document.getElementById('pz-final-scores'); sc.innerHTML='';
-  uids.forEach((uid,i)=>{const p=gs.players[uid];const b=document.createElement('div');b.className='fi-box'+(i===0&&!tied?' winner':'');b.innerHTML=`<div class="fi-crown">${i===0&&!tied?'👑':'🧩'}</div><div class="fi-name">${p.name}${uid===myUid?' (you)':''}</div><div class="fi-score">${p.score}</div><div class="sb-role">pieces placed</div>`;sc.appendChild(b);});
+  if(pzSoloMode||uids.length===1){
+    const p=gs.players[uids[0]];
+    document.getElementById('pz-complete-sub').textContent=`${photo?.label||''} — Solved in ${gs.moves||0} moves! 🎉`;
+    const sc=document.getElementById('pz-final-scores'); sc.innerHTML='';
+    const b=document.createElement('div');b.className='fi-box winner';
+    b.innerHTML=`<div class="fi-crown">🏆</div><div class="fi-name">${p?.name||'You'}</div><div class="fi-score">${p?.score||0}</div><div class="sb-role">pieces placed</div>`;sc.appendChild(b);
+  } else {
+    const tied=(gs.players[uids[0]]?.score||0)===(gs.players[uids[1]]?.score||0);
+    document.getElementById('pz-complete-sub').textContent=tied?`${photo?.label} — and it was a tie! 🤝`:`${photo?.label} — ${gs.players[uids[0]]?.name} wins! 🎉`;
+    const sc=document.getElementById('pz-final-scores'); sc.innerHTML='';
+    uids.forEach((uid,i)=>{const p=gs.players[uid];const b=document.createElement('div');b.className='fi-box'+(i===0&&!tied?' winner':'');b.innerHTML=`<div class="fi-crown">${i===0&&!tied?'👑':'🧩'}</div><div class="fi-name">${p.name}${uid===myUid?' (you)':''}</div><div class="fi-score">${p.score}</div><div class="sb-role">pieces placed</div>`;sc.appendChild(b);});
+  }
   spawnConfetti();
 }
 
