@@ -204,9 +204,14 @@ input[type=text]::placeholder{color:rgba(245,240,234,.3);font-weight:400}
 .pz-s2{color:var(--teal)}
 
 /* Piece tray */
-.pz-tray-container{width:100%;flex-shrink:0;border-bottom:2px solid rgba(78,205,196,.15);background:rgba(0,0,0,.55)}
+.pz-tray-container{width:100%;flex-shrink:0;border-bottom:2px solid rgba(78,205,196,.2);background:rgba(0,0,0,.6);max-height:38vh;overflow:hidden;display:flex;flex-direction:column}
 .pz-tray-label{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);padding:5px 10px 0;flex-shrink:0}
-.pz-tray{display:flex;flex-wrap:wrap;gap:5px;padding:6px 8px;overflow-y:auto;-webkit-overflow-scrolling:touch;align-content:flex-start}
+.pz-tray-wrapper{flex:1;display:flex;overflow:hidden;min-height:0}
+/* Left-side scroll track */
+.pz-scroll-track{width:22px;background:rgba(255,255,255,.05);border-right:1.5px solid rgba(78,205,196,.25);position:relative;flex-shrink:0;cursor:pointer;touch-action:none}
+.pz-scroll-thumb{position:absolute;left:3px;right:3px;background:rgba(78,205,196,.7);border-radius:10px;min-height:28px;transition:top .08s}
+.pz-tray{flex:1;display:flex;flex-wrap:wrap;gap:5px;padding:6px 8px;overflow-y:scroll;-webkit-overflow-scrolling:touch;align-content:flex-start;scrollbar-width:none}
+.pz-tray::-webkit-scrollbar{display:none}
 .pz-piece{border-radius:5px;border:2px solid rgba(255,255,255,.3);cursor:grab;flex-shrink:0;background-repeat:no-repeat;transition:border-color .15s,box-shadow .15s,transform .15s;touch-action:none}
 .pz-piece:active{transform:scale(1.05)}
 .pz-piece.hinted{border-color:white;box-shadow:0 0 16px rgba(255,255,255,.8);animation:hintPulse 1s ease-in-out infinite}
@@ -214,10 +219,11 @@ input[type=text]::placeholder{color:rgba(245,240,234,.3);font-weight:400}
 .pz-piece.dragging-src{opacity:.2}
 
 /* Puzzle board */
-.pz-board-container{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:auto;padding:6px}
-.pz-board{display:grid;border:2px solid rgba(78,205,196,.4);border-radius:6px;overflow:hidden;box-shadow:0 0 24px rgba(78,205,196,.1)}
-.pz-slot{border:1.5px solid rgba(255,255,255,.22);background:rgba(255,255,255,.04);position:relative;background-repeat:no-repeat;transition:background-color .15s,border-color .15s}
-.pz-slot.placed{border-color:rgba(78,205,196,.6);background:none}
+.pz-board-container{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:auto;padding:8px;background:rgba(5,5,15,.8)}
+.pz-board{display:grid;border:2.5px solid rgba(78,205,196,.5);border-radius:4px;overflow:hidden;box-shadow:0 0 30px rgba(78,205,196,.12),0 0 60px rgba(0,0,0,.5)}
+/* Grid cells — visible teal lines = the slots */
+.pz-slot{border:1.5px solid rgba(78,205,196,.4);background:rgba(6,6,20,.7);position:relative;background-repeat:no-repeat;transition:background-color .15s,border-color .15s}
+.pz-slot.placed{border-color:rgba(78,205,196,.7);background:none}
 .pz-slot.wrong-flash{background:rgba(232,85,85,.35)!important;border-color:var(--red)!important}
 .pz-slot.correct-flash{background:rgba(78,205,196,.35)!important;border-color:white!important}
 .pz-slot .placed-check{position:absolute;bottom:2px;right:2px;font-size:10px;line-height:1;background:rgba(0,0,0,.6);border-radius:50%;width:15px;height:15px;display:flex;align-items:center;justify-content:center;font-weight:700}
@@ -474,7 +480,12 @@ input[type=text]::placeholder{color:rgba(245,240,234,.3);font-weight:400}
 
   <div class="pz-tray-container" id="pz-tray-container">
     <div class="pz-tray-label">Piece Tray — <span id="pz-tray-instruction">drag a piece to the board</span></div>
-    <div class="pz-tray" id="pz-tray"></div>
+    <div class="pz-tray-wrapper">
+      <div class="pz-scroll-track" id="pz-scroll-track">
+        <div class="pz-scroll-thumb" id="pz-scroll-thumb"></div>
+      </div>
+      <div class="pz-tray" id="pz-tray"></div>
+    </div>
   </div>
 
   <div class="pz-board-container">
@@ -919,10 +930,10 @@ async function pzStartGame(){
 function pzEnterGame(gs){
   if(!document.getElementById('screen-pz-game').classList.contains('active')){
     show('screen-pz-game');
-    // Allow layout to settle before computing piece sizes
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    // Wait for CSS layout (especially tray max-height) before measuring
+    setTimeout(()=>{
       pzLoadImage(gs).then(()=>pzRenderAll(gs));
-    }));
+    },80);
   } else {
     pzRenderAll(gs);
   }
@@ -979,12 +990,14 @@ function pzRenderTopBar(gs){
 }
 
 function pzComputePieceSize(gridSize){
-  const boardContainer=document.getElementById('pz-board-container');
-  const aw=Math.max(200, boardContainer.clientWidth-12);
-  const ah=Math.max(200, boardContainer.clientHeight-12);
-  const byW=Math.floor(aw/gridSize);
-  const byH=Math.floor(ah/gridSize);
-  return Math.max(28, Math.min(byW, byH));
+  // Use actual tray height now that CSS max-height caps it
+  const topH=(document.querySelector('.pz-topbar')?.offsetHeight||54)+4;
+  const trayH=document.getElementById('pz-tray-container')?.offsetHeight||Math.floor(window.innerHeight*0.38);
+  const availH=Math.max(120, window.innerHeight-topH-trayH-20);
+  const availW=Math.max(120, window.innerWidth-14);
+  const byW=Math.floor(availW/gridSize);
+  const byH=Math.floor(availH/gridSize);
+  return Math.max(30, Math.min(byW,byH));
 }
 
 function pzRenderBoard(gs){
@@ -1044,15 +1057,12 @@ function pzRenderTray(gs){
   const isSolo=pzSoloMode;
   const isMyTurn=isSolo||(gs.currentTurn===myUid);
 
-  // Tray piece size: fit cols across width, cap at comfortable touch size
+  // Piece size in tray — fit cols across width, cap at comfortable touch size
   const screenW=window.innerWidth;
   const cols=Math.min(g, Math.ceil(Math.sqrt(gs.totalPieces||9)));
-  const ps=Math.max(44, Math.min(68, Math.floor((screenW-20)/cols)-6));
+  const ps=Math.max(44, Math.min(68, Math.floor((screenW-30)/cols)-6));
   const totalImgSize=g*ps;
-
-  // Set tray max height to ~2.5 rows
-  const rowH=ps+6;
-  document.getElementById('pz-tray').style.maxHeight=(rowH*2.5+8)+'px';
+  // Max-height is now handled by CSS (.pz-tray-container max-height:38vh)
 
   tray.innerHTML='';
   const pieces=gs.pieces||[];
@@ -1079,6 +1089,8 @@ function pzRenderTray(gs){
     }
     tray.appendChild(p);
   });
+  // Update scroll thumb after pieces render
+  setTimeout(()=>{pzUpdateScrollThumb();pzBindScrollTrack();},120);
 }
 
 // ══════════════════════════════════════════
@@ -1176,8 +1188,43 @@ function pzCleanDrag(){
 }
 
 // ══════════════════════════════════════════
-//  PUZZLE — HINT (non-active player)
+//  PUZZLE — SCROLL THUMB
 // ══════════════════════════════════════════
+function pzUpdateScrollThumb(){
+  const tray=document.getElementById('pz-tray');
+  const track=document.getElementById('pz-scroll-track');
+  const thumb=document.getElementById('pz-scroll-thumb');
+  if(!tray||!track||!thumb)return;
+  const trackH=track.clientHeight;
+  const scrollH=tray.scrollHeight;
+  const clientH=tray.clientHeight;
+  if(scrollH<=clientH||trackH<=0){thumb.style.display='none';return;}
+  thumb.style.display='block';
+  const ratio=clientH/scrollH;
+  const thumbH=Math.max(28,ratio*trackH);
+  const scrollRatio=tray.scrollTop/(scrollH-clientH);
+  thumb.style.height=thumbH+'px';
+  thumb.style.top=(scrollRatio*(trackH-thumbH))+'px';
+}
+function pzBindScrollTrack(){
+  const tray=document.getElementById('pz-tray');
+  const track=document.getElementById('pz-scroll-track');
+  if(!tray||!track)return;
+  tray.addEventListener('scroll',pzUpdateScrollThumb,{passive:true});
+  // Tap/drag on track scrolls tray
+  const scrollTo=(clientY)=>{
+    const r=track.getBoundingClientRect();
+    const ratio=Math.max(0,Math.min(1,(clientY-r.top)/r.height));
+    tray.scrollTop=ratio*(tray.scrollHeight-tray.clientHeight);
+  };
+  let tracking=false;
+  track.addEventListener('touchstart',e=>{e.preventDefault();tracking=true;scrollTo(e.touches[0].clientY);},{passive:false});
+  track.addEventListener('touchmove',e=>{e.preventDefault();if(tracking)scrollTo(e.touches[0].clientY);},{passive:false});
+  track.addEventListener('touchend',()=>{tracking=false;});
+  track.addEventListener('mousedown',e=>{tracking=true;scrollTo(e.clientY);});
+  document.addEventListener('mousemove',e=>{if(tracking)scrollTo(e.clientY);});
+  document.addEventListener('mouseup',()=>{tracking=false;});
+}
 function pzTouchHint(e){e.preventDefault();pzSendHint(e.currentTarget);}
 function pzClickHint(e){pzSendHint(e.currentTarget);}
 function pzSendHint(el){
