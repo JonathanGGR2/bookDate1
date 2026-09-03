@@ -221,9 +221,11 @@ input[type=text]::placeholder{color:rgba(245,240,234,.3);font-weight:400}
 /* Puzzle board */
 .pz-board-container{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:auto;padding:8px;background:rgba(5,5,15,.8)}
 .pz-board{display:grid;border:2.5px solid rgba(78,205,196,.5);border-radius:4px;overflow:hidden;box-shadow:0 0 30px rgba(78,205,196,.12),0 0 60px rgba(0,0,0,.5)}
-/* Grid cells — visible teal lines = the slots */
-.pz-slot{border:1.5px solid rgba(78,205,196,.4);background:rgba(6,6,20,.7);position:relative;background-repeat:no-repeat;transition:background-color .15s,border-color .15s}
+/* Grid cells — teal lines easy/medium, white lines intermediate/hard */
+.pz-slot{border:1.5px solid rgba(78,205,196,.4);background:rgba(6,6,20,.85);position:relative;background-repeat:no-repeat;transition:background-color .15s,border-color .15s}
+.pz-slot.pz-slot-hardgrid{border-color:rgba(255,255,255,.38);background:rgba(0,0,0,.9)}
 .pz-slot.placed{border-color:rgba(78,205,196,.7);background:none}
+.pz-slot.pz-slot-hardgrid.placed{border-color:rgba(255,255,255,.65)}
 .pz-slot.wrong-flash{background:rgba(232,85,85,.35)!important;border-color:var(--red)!important}
 .pz-slot.correct-flash{background:rgba(78,205,196,.35)!important;border-color:white!important}
 .pz-slot .placed-check{position:absolute;bottom:2px;right:2px;font-size:10px;line-height:1;background:rgba(0,0,0,.6);border-radius:50%;width:15px;height:15px;display:flex;align-items:center;justify-content:center;font-weight:700}
@@ -505,6 +507,19 @@ input[type=text]::placeholder{color:rgba(245,240,234,.3);font-weight:400}
   <button class="btn btn-ghost" onclick="show('screen-menu')">← Playroom</button>
 </div>
 
+<!-- ══════════ LEAVE CONFIRM DIALOG ══════════ -->
+<div id="leave-confirm" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.85);align-items:center;justify-content:center;padding:24px">
+  <div style="background:#16213e;border-radius:22px;padding:28px 24px;max-width:340px;width:100%;text-align:center;border:1.5px solid rgba(255,255,255,.1);box-shadow:0 20px 60px rgba(0,0,0,.6)">
+    <div style="font-size:40px;margin-bottom:10px">⚠️</div>
+    <div style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--gold);margin-bottom:8px">Leave Game?</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:22px;line-height:1.65">Your progress will be lost.<br>Are you sure you want to leave?</div>
+    <div style="display:flex;gap:10px">
+      <button onclick="leaveGameConfirmed()" style="flex:1;background:linear-gradient(135deg,var(--red),#b02020);color:white;border:none;border-radius:12px;padding:13px;font-family:'Fredoka One',cursive;font-size:16px;cursor:pointer">Leave</button>
+      <button onclick="hideLeaveConfirm()" style="flex:1;background:rgba(255,255,255,.08);color:var(--cream);border:1.5px solid rgba(255,255,255,.2);border-radius:12px;padding:13px;font-family:'Fredoka One',cursive;font-size:16px;cursor:pointer">Stay</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ══════════════════════════════════════════
 //  FIREBASE — hardcoded loviesgame config
@@ -526,10 +541,33 @@ const myUid = sessionStorage.getItem('uid') || (() => { const u=Math.random().to
 // ══════════════════════════════════════════
 //  SHARED HELPERS
 // ══════════════════════════════════════════
+// Screens where accidental back should trigger a confirm
+const GAME_SCREENS=new Set(['screen-dg-draw','screen-dg-guess','screen-dg-round-end',
+  'screen-dg-photo','screen-dg-lobby','screen-pz-lobby','screen-pz-select',
+  'screen-pz-game','screen-pz-complete','screen-dg-final']);
+
 function show(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
+  // Push a history entry so the back button fires popstate, not navigation
+  history.pushState({screenId:id},'');
+}
+
+function showLeaveConfirm(){
+  document.getElementById('leave-confirm').style.display='flex';
+}
+function hideLeaveConfirm(){
+  document.getElementById('leave-confirm').style.display='none';
+}
+function leaveGameConfirmed(){
+  hideLeaveConfirm();
+  // Clean up game state
+  if(dgRoomRef){dgRoomRef.off();dgRoomRef=null;}
+  if(pzRoomRef){pzRoomRef.off();pzRoomRef=null;}
+  dgClearTimerInterval();
+  pzLoadedImg=null; pzSoloMode=false;
+  show('screen-menu');
 }
 function showToast(msg) {
   const t=document.getElementById('toast');
@@ -1033,14 +1071,17 @@ function pzRenderBoard(gs){
         slot.classList.add(placerIsP1?'pz-placed-by-p1':'pz-placed-by-p2');
         const ck=document.createElement('div');ck.className='placed-check';ck.textContent='✓';slot.appendChild(ck);
       } else {
-        // Faint guide image + clear grid border lines
-        slot.style.backgroundImage=`url('${imgSrc}')`;
-        slot.style.backgroundSize=`${totalImgSize}px ${totalImgSize}px`;
-        slot.style.backgroundPosition=`-${c*ps}px -${r*ps}px`;
-        // Dark overlay dims the guide WITHOUT touching the border opacity
-        const overlay=document.createElement('div');
-        overlay.style.cssText='position:absolute;inset:0;background:rgba(8,8,16,0.87);pointer-events:none;';
-        slot.appendChild(overlay);
+        // No photo backdrop at all — clean dark cell
+        // Intermediate (5×5) and Hard (6×6): white grid lines + subtle inner cross
+        if(g>=5){
+          slot.classList.add('pz-slot-hardgrid');
+          // Inner cross-hair at centre to help placement
+          const cx=document.createElement('div');
+          cx.style.cssText='position:absolute;top:50%;left:0;right:0;height:1px;background:rgba(255,255,255,0.06);transform:translateY(-50%);pointer-events:none';
+          const cy=document.createElement('div');
+          cy.style.cssText='position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(255,255,255,0.06);transform:translateX(-50%);pointer-events:none';
+          slot.appendChild(cx); slot.appendChild(cy);
+        }
       }
       board.appendChild(slot);
     }
@@ -1287,6 +1328,24 @@ function pzShowComplete(gs){
 //  INIT
 // ══════════════════════════════════════════
 document.addEventListener('DOMContentLoaded',()=>{
+  // Seed history so first back press fires popstate, not page exit
+  history.replaceState({screenId:'screen-menu'},'');
+  history.pushState({screenId:'screen-menu'},'');
+
+  // ── BACK BUTTON PROTECTION ──
+  window.addEventListener('popstate',()=>{
+    // Always re-push so we stay on the SPA
+    history.pushState({screenId:'current'},'');
+    const active=document.querySelector('.screen.active');
+    if(!active||active.id==='screen-menu')return;
+    if(GAME_SCREENS.has(active.id)){
+      showLeaveConfirm();
+    } else {
+      // Safe home screens — just go back to menu
+      show('screen-menu');
+    }
+  });
+
   document.getElementById('dg-guess-input').addEventListener('keydown',e=>{if(e.key==='Enter')dgSubmitGuess();});
   document.getElementById('dg-join-code').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase();});
   document.getElementById('pz-join-code').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase();});
